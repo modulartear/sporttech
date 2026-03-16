@@ -51,86 +51,89 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-full mb-4">
-              <UserPlus className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
-            <p className="text-slate-400">Únete y disfruta de eventos en vivo</p>
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] bg-grid px-4 py-20">
+      <div className="w-full max-w-md relative">
+        <div className="absolute -top-20 -left-20 w-40 h-40 bg-pink-500/10 blur-[80px] rounded-full" />
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-rose-700/10 blur-[80px] rounded-full" />
+        
+        <div className="bg-zinc-900/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-zinc-800 p-10 relative z-10">
+          <div className="text-center mb-10">
+            <Link to="/" className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-700 rounded-2xl mb-6 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+              <UserPlus className="w-10 h-10 text-white" />
+            </Link>
+            <h1 className="text-4xl font-black italic tracking-tighter uppercase text-white mb-2">Sport<span className="text-pink-500">tech</span></h1>
+            <p className="text-zinc-500 font-medium">Únete a la nueva era del deporte</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-slate-300 mb-2">
-                Nombre Completo
+              <label htmlFor="fullName" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
+                Full Name
               </label>
               <input
                 {...register('fullName')}
                 type="text"
                 id="fullName"
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                placeholder="Juan Pérez"
+                className="w-full px-5 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all"
+                placeholder="Nombre Completo"
               />
               {errors.fullName && (
-                <p className="mt-1 text-sm text-red-400">{errors.fullName.message}</p>
+                <p className="mt-2 text-sm text-pink-500 font-medium ml-1">{errors.fullName.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                Email
+              <label htmlFor="email" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
+                Email Address
               </label>
               <input
                 {...register('email')}
                 type="email"
                 id="email"
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                placeholder="tu@email.com"
+                className="w-full px-5 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all"
+                placeholder="atleta@sporttech.com"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+                <p className="mt-2 text-sm text-pink-500 font-medium ml-1">{errors.email.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
-                Contraseña
+              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
+                Secret Password
               </label>
               <input
                 {...register('password')}
                 type="password"
                 id="password"
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                className="w-full px-5 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all font-mono"
                 placeholder="••••••••"
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+                <p className="mt-2 text-sm text-pink-500 font-medium ml-1">{errors.password.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-300 mb-2">
-                Confirmar Contraseña
+              <label htmlFor="confirmPassword" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
+                Confirm Password
               </label>
               <input
                 {...register('confirmPassword')}
                 type="password"
                 id="confirmPassword"
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                className="w-full px-5 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all font-mono"
                 placeholder="••••••••"
               />
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-400">{errors.confirmPassword.message}</p>
+                <p className="mt-2 text-sm text-pink-500 font-medium ml-1">{errors.confirmPassword.message}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full btn-gradient py-4 rounded-2xl flex items-center justify-center gap-3 text-base uppercase font-black italic tracking-tighter"
             >
               {isLoading ? (
                 <>
@@ -140,16 +143,16 @@ export function RegisterPage() {
               ) : (
                 <>
                   <UserPlus className="w-5 h-5" />
-                  <span>Crear Cuenta</span>
+                  <span>Crear mi cuenta</span>
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-slate-400">
+          <div className="mt-10 text-center">
+            <p className="text-zinc-500 font-medium">
               ¿Ya tienes una cuenta?{' '}
-              <Link to="/login" className="text-green-400 hover:text-green-300 font-medium transition">
+              <Link to="/login" className="text-pink-500 hover:text-pink-400 font-black italic uppercase transition-colors">
                 Inicia sesión
               </Link>
             </p>

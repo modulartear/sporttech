@@ -105,15 +105,17 @@ export function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 premium-gradient bg-grid">
-      <header className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-200 premium-gradient bg-grid">
+      <header className="border-b border-zinc-800/50 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                <Play className="w-6 h-6 text-white" />
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-700 rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-transform">
+                <Play className="w-6 h-6 fill-white" />
               </div>
-              <span className="text-xl font-bold text-white">StreamEvents</span>
+              <span className="text-2xl font-black italic tracking-tighter uppercase text-white">
+                Sport<span className="text-pink-500">tech</span>
+              </span>
             </Link>
 
             <nav className="flex items-center gap-4">
@@ -122,22 +124,22 @@ export function HomePage() {
                   {profile?.role === 'admin' && (
                     <Link
                       to="/admin"
-                      className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white transition"
+                      className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white transition"
                     >
                       <Settings className="w-4 h-4" />
-                      <span>Admin</span>
+                      <span className="text-sm font-bold uppercase tracking-tighter">Admin</span>
                     </Link>
                   )}
                   <Link
                     to="/my-events"
-                    className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white transition"
+                    className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-white transition"
                   >
                     <User className="w-4 h-4" />
-                    <span>Mis Eventos</span>
+                    <span className="text-sm font-bold uppercase tracking-tighter">Mis Eventos</span>
                   </Link>
                   <button
                     onClick={() => signOut()}
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition"
+                    className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl transition font-bold text-sm uppercase tracking-tighter"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>Salir</span>
@@ -147,7 +149,7 @@ export function HomePage() {
                 <>
                   <Link
                     to="/login"
-                    className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white transition"
+                    className="flex items-center gap-2 px-6 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-xl transition font-bold text-sm uppercase tracking-tighter"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>Ingresar</span>

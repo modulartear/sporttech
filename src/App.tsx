@@ -16,6 +16,8 @@ import { MyEventsPage } from './pages/my-events';
 import { PaymentStatusPage } from './pages/payment-status';
 import { WatchPage } from './pages/watch';
 
+import { LandingPage } from './pages/landing';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -31,7 +33,8 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/events" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
