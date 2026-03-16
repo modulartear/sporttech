@@ -26,7 +26,7 @@ function asPaymentStatus(status: string): "pending" | "approved" | "rejected" | 
   return "pending";
 }
 
-export const setAdminClaim = onCall(async (request) => {
+export const setAdminClaim = onCall({ enforceAppCheck: false }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "User must be authenticated");
   }
@@ -59,7 +59,7 @@ export const setAdminClaim = onCall(async (request) => {
   return { ok: true, uid: targetUser.uid };
 });
 
-export const createMercadoPagoPreference = onCall({ secrets: ["MERCADOPAGO_ACCESS_TOKEN"] }, async (request) => {
+export const createMercadoPagoPreference = onCall({ secrets: ["MERCADOPAGO_ACCESS_TOKEN"], enforceAppCheck: false }, async (request) => {
   try {
     const mpClient = getMPClient();
     const preferenceClient = new Preference(mpClient);

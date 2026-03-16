@@ -1,13 +1,77 @@
-import { Link } from 'react-router-dom';
-import { Play, Shield, Zap, Globe, ArrowRight, Video, Users, CreditCard } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Shield, Zap, Globe, ArrowRight, Video, Users, CreditCard } from 'lucide-react';
+import { collection, getDocs, orderBy, query, where, limit } from 'firebase/firestore';
+import { firestore } from '../lib/firebase';
 import { useAuth } from '../hooks/use-auth';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/language-switcher';
+import { EventCard, EventDoc } from '../components/event-card';
 import logo from '../assets/logo.png';
 
 export function LandingPage() {
   const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
+  const [upcomingEvents, setUpcomingEvents] = useState<EventDoc[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    setIsLoading(true);
+    try {
+      const q = query(
+        collection(firestore, 'events'),
+        where('status', 'in', ['published', 'live']),
+        orderBy('event_date', 'asc'),
+        limit(6)
+      );
+      const snap = await getDocs(q);
+      const rows = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as EventDoc[];
+
+      const now = new Date();
+      const upcoming = rows.filter((e) => new Date(e.event_date) >= now || e.status === 'live');
+      
+      setUpcomingEvents(upcoming);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBuyTicket = (eventId: string) => {
+    navigate(`/event/${eventId}`);
+  };
+
+  const locale = i18n.language === 'en' ? 'en-US' : 'es-AR';
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString(locale, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const formatTime = (dateStr: string) => {
+    return new Date(dateStr).toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatPrice = (price: number, currency: string) => {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+    }).format(price);
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-pink-500/30">
@@ -91,6 +155,55 @@ export function LandingPage() {
                   <Zap className="w-6 h-6" /> {t('hero.fast')}
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Upcoming Events Section */}
+        <section id="upcoming-events" className="py-24 relative border-t border-zinc-900 bg-zinc-950/50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+              <div>
+                <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase mb-4">
+                  {t('home.upcoming')}
+                </h2>
+                <p className="text-zinc-400 text-lg max-w-2xl">
+                  {t('home.subtitle')}
+                </p>
+              </div>
+              <Link to="/events" className="hidden md:flex items-center gap-2 text-pink-500 hover:text-pink-400 font-bold tracking-widest uppercase text-sm group transition-colors">
+                VER TODOS LOS EVENTOS <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-20">
+                <div className="inline-block w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : upcomingEvents.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {upcomingEvents.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    formatDate={formatDate}
+                    formatTime={formatTime}
+                    formatPrice={formatPrice}
+                    onBuyTicket={handleBuyTicket}
+                    t={t}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-zinc-900/30 rounded-3xl border border-zinc-800/50">
+                <p className="text-zinc-500 font-medium text-lg">{t('home.noEvents')}</p>
+              </div>
+            )}
+            
+            <div className="mt-12 text-center md:hidden">
+              <Link to="/events" className="btn-gradient px-8 py-3 rounded-xl inline-flex items-center justify-center gap-2 w-full sm:w-auto">
+                {t('home.title')} <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </section>
