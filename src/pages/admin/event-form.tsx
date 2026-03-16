@@ -16,7 +16,7 @@ const eventSchema = z.object({
   event_date: z.string().min(1, 'La fecha es requerida'),
   event_type: z.enum(['live', 'premiere', 'recorded']),
   price: z.number().min(0, 'El precio debe ser mayor o igual a 0'),
-  currency: z.enum(['ARS', 'USD', 'BRL']),
+  currencies: z.array(z.enum(['ARS', 'USD', 'BRL'])).min(1, 'Selecciona al menos una moneda'),
   thumbnail_url: z.string().url('URL inválida').optional().or(z.literal('')),
   status: z.enum(['draft', 'published', 'live', 'ended', 'cancelled']),
   max_attendees: z.number().min(1, 'Debe ser al menos 1').optional().or(z.literal(0)),
@@ -41,7 +41,7 @@ export function EventFormPage() {
     resolver: zodResolver(eventSchema),
     defaultValues: {
       event_type: 'live',
-      currency: 'ARS',
+      currencies: ['ARS'],
       status: 'draft',
       price: 0,
       access_window_hours: 0,
@@ -68,7 +68,7 @@ export function EventFormPage() {
         event_date: new Date(data.event_date).toISOString().slice(0, 16),
         event_type: data.event_type,
         price: data.price,
-        currency: data.currency,
+        currencies: data.currencies || [data.currency] || ['ARS'],
         thumbnail_url: data.thumbnail_url || '',
         status: data.status,
         max_attendees: data.max_attendees || 0,
@@ -88,6 +88,7 @@ export function EventFormPage() {
     try {
       const eventData = {
         ...data,
+        currency: data.currencies[0] || 'ARS', // Primary currency for backward compatibility
         event_date: new Date(data.event_date).toISOString(),
         max_attendees: data.max_attendees || null,
         thumbnail_url: data.thumbnail_url || null,
@@ -235,15 +236,21 @@ export function EventFormPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Moneda *</label>
-              <select
-                {...register('currency')}
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="ARS">ARS (Peso Argentino)</option>
-                <option value="USD">USD (Dólar)</option>
-                <option value="BRL">BRL (Real)</option>
-              </select>
+              <label className="block text-sm font-medium text-slate-300 mb-3">Monedas Permitidas *</label>
+              <div className="flex flex-wrap gap-4 p-4 bg-slate-900/50 border border-slate-600 rounded-lg">
+                {['ARS', 'USD', 'BRL'].map((curr) => (
+                  <label key={curr} className="flex items-center gap-2 text-white cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      value={curr}
+                      {...register('currencies')}
+                      className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-pink-500 focus:ring-pink-500 focus:ring-offset-slate-900"
+                    />
+                    <span className="group-hover:text-pink-400 transition-colors">{curr}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.currencies && <p className="mt-1 text-sm text-red-400">{errors.currencies.message}</p>}
             </div>
           </div>
 

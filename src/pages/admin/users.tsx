@@ -32,12 +32,19 @@ export function AdminUsersPage() {
       const callable = httpsCallable<any, { users: any[] }>(firebaseFunctions, 'adminListUsers');
       const result = await callable();
       
-      const rows = result.data.users.map((u: any) => ({
-        id: u.uid,
-        email: u.email,
-        created_at: { toMillis: () => new Date(u.creationTime).getTime() },
-        role: 'user', // Just default for now or we could lookup roles
-      })) as UserProfile[];
+      const profilesSnap = await getDocs(collection(firestore, 'user_profiles'));
+      const profilesMap = new Map();
+      profilesSnap.docs.forEach(d => profilesMap.set(d.id, d.data()));
+
+      const rows = result.data.users.map((u: any) => {
+        const pf = profilesMap.get(u.uid);
+        return {
+          id: u.uid,
+          email: u.email || pf?.email,
+          created_at: { toMillis: () => new Date(u.creationTime).getTime() },
+          role: pf?.role || 'user',
+        };
+      }) as UserProfile[];
       
       setUsers(rows);
     } catch (error) {
