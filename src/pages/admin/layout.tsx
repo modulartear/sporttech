@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Calendar, DollarSign, Users, BarChart3, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, Calendar, DollarSign, Users, BarChart3, ArrowLeft, Settings } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 export function AdminLayout() {
@@ -9,9 +9,8 @@ export function AdminLayout() {
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Eventos', href: '/admin/events', icon: Calendar },
     { name: 'Pagos Pendientes', href: '/admin/payments', icon: DollarSign },
-    { name: 'Reembolsos', href: '/admin/refunds', icon: DollarSign },
     { name: 'Usuarios', href: '/admin/users', icon: Users },
-    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
 
   const isActive = (path: string) => {

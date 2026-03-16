@@ -11,6 +11,8 @@ import { AdminDashboard } from './pages/admin/dashboard';
 import { AdminEventsPage } from './pages/admin/events';
 import { EventFormPage } from './pages/admin/event-form';
 import { AdminUsersPage } from './pages/admin/users';
+import { AdminPaymentsPage } from './pages/admin/payments';
+import { AdminSettingsPage } from './pages/admin/settings';
 import { EventDetailsPage } from './pages/event-details';
 import { MyEventsPage } from './pages/my-events';
 import { PaymentStatusPage } from './pages/payment-status';
@@ -71,6 +73,8 @@ function App() {
               <Route path="events/new" element={<EventFormPage />} />
               <Route path="events/:id/edit" element={<EventFormPage />} />
               <Route path="users" element={<AdminUsersPage />} />
+              <Route path="payments" element={<AdminPaymentsPage />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
 
             <Route path="/payment/success" element={<PaymentStatusPage />} />

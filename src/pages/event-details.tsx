@@ -4,7 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '../lib/firebase';
 import { createMercadoPagoPreference } from '../lib/payments';
 import { useAuth } from '../hooks/use-auth';
-import { Calendar, Clock, Play, ArrowLeft, ShieldCheck, Zap } from 'lucide-react';
+import { Calendar, Clock, Play, ArrowLeft, ShieldCheck, Zap, X, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -30,12 +30,25 @@ export function EventDetailsPage() {
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [platformSettings, setPlatformSettings] = useState<any>(null);
+  const [showPaymentSelector, setShowPaymentSelector] = useState(false);
+  const [showTransferDetails, setShowTransferDetails] = useState(false);
 
   useEffect(() => {
     if (id) {
       fetchEventData();
+      fetchPlatformSettings();
     }
   }, [id, user]);
+
+  const fetchPlatformSettings = async () => {
+    try {
+      const snap = await getDoc(doc(firestore, 'settings', 'platform'));
+      if (snap.exists()) {
+        setPlatformSettings(snap.data());
+      }
+    } catch(e) {}
+  };
 
   const fetchEventData = async () => {
     setIsLoading(true);
@@ -62,13 +75,17 @@ export function EventDetailsPage() {
     }
   };
 
-  const handleBuyTicket = async () => {
+  const initiatePayment = () => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
+    setShowPaymentSelector(true);
+  };
 
+  const handleBuyTicketMercadoPago = async () => {
     setIsProcessing(true);
+    setShowPaymentSelector(false);
     try {
       const { initPoint } = await createMercadoPagoPreference(id!);
       if (initPoint) {
@@ -77,6 +94,41 @@ export function EventDetailsPage() {
     } catch (error: any) {
       console.error('Error processing purchase:', error);
       toast.error(error.message || t('common.error'));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleBuyTicketAstroPay = () => {
+    // Placeholder for AstroPay integration
+    toast.error('AstroPay no está disponible en este momento');
+  };
+
+  const openTransferDetails = () => {
+    setShowPaymentSelector(false);
+    setShowTransferDetails(true);
+  };
+
+  const handleConfirmTransfer = async () => {
+    setIsProcessing(true);
+    try {
+      const { setDoc, serverTimestamp } = await import('firebase/firestore');
+      const purchaseId = `${user!.uid}_${id}`;
+      await setDoc(doc(firestore, 'purchases', purchaseId), {
+        user_id: user!.uid,
+        event_id: id,
+        amount: Number(event?.price),
+        currency: event?.currency,
+        payment_method: 'transfer',
+        payment_status: 'pending',
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp()
+      }, { merge: true });
+      
+      setShowTransferDetails(false);
+      navigate('/payment/pending');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al procesar la transferencia');
     } finally {
       setIsProcessing(false);
     }
@@ -216,7 +268,7 @@ export function EventDetailsPage() {
                     </button>
                   ) : (
                     <button
-                      onClick={handleBuyTicket}
+                      onClick={initiatePayment}
                       disabled={isProcessing || event.status === 'ended' || event.status === 'cancelled'}
                       className="w-full btn-gradient disabled:opacity-50 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-3 shadow-lg shadow-pink-500/20"
                     >
@@ -245,6 +297,147 @@ export function EventDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Payment Method Selector Modal */}
+      {showPaymentSelector && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-slate-800">
+              <h3 className="text-xl font-bold text-white">Selecciona tu método de pago</h3>
+              <button onClick={() => setShowPaymentSelector(false)} className="text-slate-500 hover:text-white transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <button
+                onClick={handleBuyTicketMercadoPago}
+                className="w-full flex items-center justify-between p-4 bg-sky-600/10 border border-sky-500/20 hover:border-sky-500 hover:bg-sky-600/20 rounded-2xl transition group text-left"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-sky-500/20 rounded-xl flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
+                    <CreditCard className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold text-lg">Mercado Pago</h4>
+                    <p className="text-skin-500 text-slate-400 text-sm">Tarjetas, saldo y más</p>
+                  </div>
+                </div>
+                <ArrowLeft className="w-5 h-5 text-sky-500 rotate-180" />
+              </button>
+
+              <button
+                onClick={handleBuyTicketAstroPay}
+                className="w-full flex items-center justify-between p-4 bg-red-600/10 border border-red-500/20 hover:border-red-500 hover:bg-red-600/20 rounded-2xl transition group text-left"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center text-red-400 group-hover:scale-110 transition-transform">
+                    <CreditCard className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold text-lg">AstroPay</h4>
+                    <p className="text-slate-400 text-sm">Pago seguro y rápido</p>
+                  </div>
+                </div>
+                <ArrowLeft className="w-5 h-5 text-red-500 rotate-180" />
+              </button>
+
+              {platformSettings?.transfer_enabled && (
+                <button
+                  onClick={openTransferDetails}
+                  className="w-full flex items-center justify-between p-4 bg-slate-800/50 border border-slate-700/50 hover:border-pink-500/50 hover:bg-slate-800 rounded-2xl transition group text-left"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center text-slate-300 group-hover:scale-110 transition-transform group-hover:text-pink-400">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold text-lg">Transferencia</h4>
+                      <p className="text-slate-400 text-sm">Alias / CBU directo</p>
+                    </div>
+                  </div>
+                  <ArrowLeft className="w-5 h-5 text-slate-500 group-hover:text-pink-500 rotate-180 transition-colors" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer Details Modal */}
+      {showTransferDetails && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl my-8 relative">
+            <div className="flex items-center justify-between p-6 border-b border-slate-800 sticky top-0 bg-slate-900 z-10">
+              <h3 className="text-xl font-bold text-white">Datos de Transferencia</h3>
+              <button onClick={() => setShowTransferDetails(false)} className="text-slate-500 hover:text-white transition bg-slate-800 p-2 rounded-full">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 text-center">
+                <p className="text-slate-400 text-sm mb-1">Total a transferir</p>
+                <p className="text-3xl font-black text-white">{event.currency} {new Intl.NumberFormat(locale).format(Number(event.price))}</p>
+              </div>
+
+              <div className="space-y-4">
+                {platformSettings?.transfer_bank && (
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Banco / Billetera</p>
+                    <div className="bg-slate-800 p-3 rounded-lg text-white font-medium border border-slate-700">
+                      {platformSettings.transfer_bank}
+                    </div>
+                  </div>
+                )}
+                {platformSettings?.transfer_alias && (
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">Alias</p>
+                    <div className="bg-slate-800 p-3 rounded-lg text-white font-medium border border-slate-700 text-lg flex justify-between items-center group cursor-pointer" onClick={() => { navigator.clipboard.writeText(platformSettings.transfer_alias); toast.success('Alias copiado') }}>
+                      <span>{platformSettings.transfer_alias}</span>
+                      <span className="text-xs text-pink-400 opacity-0 group-hover:opacity-100 transition">Copiar</span>
+                    </div>
+                  </div>
+                )}
+                {platformSettings?.transfer_cbu && (
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-1">CBU / CVU</p>
+                    <div className="bg-slate-800 p-3 rounded-lg text-white font-medium border border-slate-700 font-mono text-sm tracking-widest flex justify-between items-center group cursor-pointer" onClick={() => { navigator.clipboard.writeText(platformSettings.transfer_cbu); toast.success('CBU copiado') }}>
+                      <span>{platformSettings.transfer_cbu}</span>
+                      <span className="text-xs text-pink-400 opacity-0 group-hover:opacity-100 transition">Copiar</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl">
+                <p className="text-sm text-blue-200">
+                  <strong className="text-blue-400 block mb-1">Instrucciones:</strong>
+                  Realiza la transferencia desde tu banco o billetera virtual por el monto exacto. Luego, haz clic en "Ya Transferí" para registrar tu pago. Tu ticket se liberará una vez validemos la acreditación.
+                </p>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => { setShowTransferDetails(false); setShowPaymentSelector(true); }}
+                  className="w-1/3 py-4 rounded-xl font-bold bg-slate-800 text-white hover:bg-slate-700 transition"
+                  disabled={isProcessing}
+                >
+                  Volver
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmTransfer}
+                  disabled={isProcessing}
+                  className="w-2/3 py-4 rounded-xl font-bold text-white btn-gradient disabled:opacity-50 transition shadow-lg shadow-pink-500/20 flex justify-center items-center"
+                >
+                  {isProcessing ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Ya Transferí'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
