@@ -93,7 +93,11 @@ export function EventDetailsPage() {
       }
     } catch (error: any) {
       console.error('Error processing purchase:', error);
-      toast.error(error.message || t('common.error'));
+      if (error?.message?.includes('legal HTTP header value')) {
+        toast.error('Sesión corrupta detectada. Por favor, cierra sesión y vuelve a entrar.');
+      } else {
+        toast.error(error.message || t('common.error'));
+      }
     } finally {
       setIsProcessing(false);
     }
