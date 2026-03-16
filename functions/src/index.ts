@@ -15,7 +15,7 @@ import { defineSecret } from "firebase-functions/params";
 const mercadoPagoToken = defineSecret("MERCADOPAGO_ACCESS_TOKEN");
 
 const getMPClient = () => {
-  const token = mercadoPagoToken.value() || process.env.MERCADOPAGO_ACCESS_TOKEN;
+  const token = (mercadoPagoToken.value() || process.env.MERCADOPAGO_ACCESS_TOKEN || "").trim();
   if (!token) {
     throw new Error("Missing MERCADOPAGO_ACCESS_TOKEN");
   }
