@@ -145,19 +145,34 @@ export function WatchPage() {
       </nav>
 
       {/* Main Content: Video Player */}
-      <main className="flex-1 flex items-center justify-center relative bg-slate-950">
+      <main 
+        className="flex-1 flex items-center justify-center relative bg-slate-950 select-none"
+        onContextMenu={(e) => e.preventDefault()}
+      >
         <div className="w-full aspect-video max-w-6xl shadow-2xl shadow-pink-500/10 relative group">
+          {/* Main Video Shield - Invisible layer to block direct interaction with YouTube's context menu */}
+          <div className="absolute inset-0 z-10 pointer-events-none border-4 border-transparent group-hover:border-pink-500/10 rounded-2xl transition-colors" />
+          
           <iframe
-            src={`https://www.youtube.com/embed/${event?.youtube_video_id}?autoplay=1&modestbranding=1&rel=0`}
+            src={`https://www.youtube.com/embed/${event?.youtube_video_id}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&showinfo=0&disablekb=1&origin=${window.location.origin}`}
             title={event?.title || 'Video'}
-            className="w-full h-full rounded-2xl md:border md:border-slate-800 bg-black"
+            className="w-full h-full rounded-2xl md:border md:border-slate-800 bg-black relative z-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
+
+          {/* Top Protection Bar - Blocks YouTube title and share button hover areas */}
+          <div className="absolute top-0 left-0 right-0 h-16 z-20" onContextMenu={(e) => e.preventDefault()} />
+          
+          {/* Logo/Watermark protection overlay */}
+          <div className="absolute bottom-4 right-4 z-20 w-24 h-12" onContextMenu={(e) => e.preventDefault()} />
         </div>
         
-        {/* Protection Overlay (Invisible) */}
-        <div className="absolute inset-0 z-[1] pointer-events-none" />
+        {/* Global Protection Overlay */}
+        <div 
+          className="absolute inset-0 z-[5] pointer-events-auto bg-transparent" 
+          onContextMenu={(e) => e.preventDefault()}
+        />
       </main>
 
       {/* Footer Info */}
