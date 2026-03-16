@@ -1,0 +1,166 @@
+{
+  "nav": {
+    "features": "Características",
+    "about": "Nosotros",
+    "platform": "PLATAFORMA",
+    "dashboard": "Ir al Panel",
+    "signIn": "Iniciar Sesión",
+    "getStarted": "Comenzar"
+  },
+  "hero": {
+    "badge": "STREAMING EN VIVO EVOLUCIONADO",
+    "title": "El Futuro del Streaming Deportivo",
+    "description": "Experimenta streaming de alto rendimiento con boletería digital integrada, analíticas en tiempo real y procesamiento de pagos sin fricciones. Diseñado para el atleta y el fan moderno.",
+    "explore": "Explorar Eventos",
+    "howItWorks": "Cómo funciona",
+    "global": "GLOBAL",
+    "secure": "SEGURO",
+    "fast": "RÁPIDO"
+  },
+  "features": {
+    "hd": {
+      "title": "Streaming HD",
+      "description": "Transmisiones en alta definición con latencia cero optimizadas para dispositivos móviles y web."
+    },
+    "ticketing": {
+      "title": "Boletería Inteligente",
+      "description": "Pagos integrados con MercadoPago para acceso instantáneo a eventos en vivo premium."
+    },
+    "security": {
+      "title": "Anti-Piratería",
+      "description": "Tokens de inserción seguros y verificación de usuarios para proteger tu contenido valioso."
+    },
+    "community": {
+      "title": "Comunidad",
+      "description": "Funciones sociales integradas e interacción en tiempo real para fans de todo el mundo."
+    },
+    "scale": {
+      "title": "Escala Global",
+      "description": "La red de entrega de contenido (CDN) garantiza un rendimiento fluido desde cualquier lugar."
+    },
+    "performance": {
+      "title": "Rendimiento Élite",
+      "description": "Arquitectura optimizada para manejar miles de espectadores concurrentes."
+    }
+  },
+  "footer": {
+    "description": "La plataforma líder para streaming deportivo y gestión de eventos digitales. Vive el deporte como nunca antes.",
+    "platform": "Plataforma",
+    "support": "Soporte",
+    "legal": "Legal",
+    "browseEvents": "Explorar Eventos",
+    "myPurchases": "Mis Compras",
+    "pricing": "Precios",
+    "faq": "Preguntas Frecuentes",
+    "helpCenter": "Centro de Ayuda",
+    "contact": "Contacto",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "rights": "© 2024 Sporttech Inc. Todos los derechos reservados."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "exit": "Salir",
+    "signIn": "Ingresar",
+    "register": "Registrarse",
+    "admin": "Admin",
+    "myEvents": "Mis Eventos",
+    "buyTicket": "Comprar entrada",
+    "finished": "Finalizado",
+    "live": "EN VIVO",
+    "draft": "BORRADOR",
+    "back": "Volver",
+    "accessStream": "ACCEDER AL STREAM",
+    "eventEnded": "EVENTO FINALIZADO",
+    "date": "Fecha",
+    "time": "Hora",
+    "eventNotFound": "Evento no encontrado",
+    "backToHome": "Volver al inicio",
+    "aboutEvent": "Acerca de este evento",
+    "noDescription": "No hay descripción disponible para este evento.",
+    "secureStream": "Transmisión Segura",
+    "secureStreamDesc": "Acceso exclusivo mediante token encriptado personal.",
+    "instantAccess": "Acceso Instantáneo",
+    "instantAccessDesc": "Recibe tu acceso automáticamente tras confirmar el pago.",
+    "ticketPrice": "Precio de Entrada",
+    "paymentMethods": "Métodos de pago globales",
+    "watchTitle": "Ver Evento",
+    "chatTitle": "Chat en vivo",
+    "noChat": "El chat no está disponible para este evento.",
+    "loadingStream": "Cargando transmisión...",
+    "purchasedOn": "Comprado el",
+    "viewStream": "Ver Transmisión",
+    "waitingConfirmation": "Esperando confirmación",
+    "tryAgain": "Intentar nuevamente",
+    "noTicketsYet": "No tienes entradas aún",
+    "noTicketsYetDesc": "Explora los eventos disponibles y adquiere tu acceso para comenzar a disfrutar del mejor contenido.",
+    "myTickets": "Mis Entradas",
+    "acquiredEvents": "Mis Eventos Adquiridos"
+  },
+  "home": {
+    "title": "Eventos en Vivo Exclusivos",
+    "subtitle": "Accede a transmisiones en vivo de eventos únicos. Compra tu entrada y disfruta desde cualquier lugar.",
+    "loadingEvents": "Cargando eventos...",
+    "upcoming": "Próximos Eventos",
+    "past": "Eventos Pasados",
+    "noEvents": "No hay eventos disponibles en este momento."
+  },
+  "errors": {
+    "noAccess": {
+      "title": "Acceso Denegado",
+      "desc": "No tienes una suscripción activa para este evento."
+    },
+    "unauthorized": {
+      "title": "Sesión Requerida",
+      "desc": "Debes iniciar sesión para acceder a la transmisión."
+    },
+    "notFound": {
+      "desc": "El evento que intentas ver no existe."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Ingresa a la plataforma elite",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "atleta@sporttech.com",
+      "passwordLabel": "Security Key",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "submit": "Ingresar a la cuenta",
+      "authenticating": "Autenticando...",
+      "success": "Inicio de sesión exitoso",
+      "error": "Error al iniciar sesión",
+      "newUser": "¿Eres nuevo en la élite?",
+      "registerLink": "Regístrate"
+    },
+    "register": {
+      "title": "Únete a la élite",
+      "nameLabel": "Nombre Completo",
+      "namePlaceholder": "Juan Pérez",
+      "submit": "Crear Cuenta",
+      "creating": "Creando Cuenta...",
+      "success": "Cuenta creada exitosamente",
+      "error": "Error al crear cuenta",
+      "alreadyUser": "¿Ya eres parte de la élite?",
+      "loginLink": "Inicia sesión",
+      "confirmLabel": "Confirmar Security Key"
+    }
+  },
+  "payment": {
+    "status": {
+      "successTitle": "¡Pago Exitoso!",
+      "pendingTitle": "Pago en Proceso",
+      "failedTitle": "Pago Fallido",
+      "successDesc": "Tu entrada ha sido confirmada con éxito. Ya puedes acceder al evento desde tu panel de usuario.",
+      "pendingDesc": "Estamos confirmando los fondos con tu banco. Generalmente esto toma unos minutos.",
+      "failedDesc": "No hemos podido procesar tu pago. Por favor intenta con otro método o contacta a soporte.",
+      "viewEvents": "Ver Mis Eventos",
+      "backToHome": "Volver al Inicio",
+      "toastSuccess": "¡Pago confirmado! Tu entrada ha sido activada.",
+      "toastPending": "Estamos procesando tu pago. Te avisaremos pronto.",
+      "toastFailed": "No se pudo completar el pago."
+    }
+  }
+}

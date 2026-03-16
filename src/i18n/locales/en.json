@@ -1,0 +1,166 @@
+{
+  "nav": {
+    "features": "Features",
+    "about": "About",
+    "platform": "PLATFORM",
+    "dashboard": "Go to Dashboard",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "badge": "LIVE STREAMING EVOLVED",
+    "title": "The Future of Sports Streaming",
+    "description": "Experience high-performance streaming with integrated digital ticketing, real-time analytics, and seamless payment processing. Built for the modern athlete and fan.",
+    "explore": "Explore Events",
+    "howItWorks": "How it works",
+    "global": "GLOBAL",
+    "secure": "SECURE",
+    "fast": "FAST"
+  },
+  "features": {
+    "hd": {
+      "title": "HD Streaming",
+      "description": "Zero-latency high definition streams optimized for mobile and web viewers."
+    },
+    "ticketing": {
+      "title": "Smart Ticketing",
+      "description": "Integrated MercadoPago payments for instant access to premium live events."
+    },
+    "security": {
+      "title": "Anti-Piracy",
+      "description": "Secure embed tokens and user verification to protect your valuable content."
+    },
+    "community": {
+      "title": "Community",
+      "description": "Built-in social features and real-time interaction for fans worldwide."
+    },
+    "scale": {
+      "title": "Global Scale",
+      "description": "Content delivery network (CDN) ensures smooth performance from anywhere."
+    },
+    "performance": {
+      "title": "Elite Performance",
+      "description": "Optimized architecture for handling thousands of concurrent viewers."
+    }
+  },
+  "footer": {
+    "description": "The premier platform for sports streaming and digital event management. Experience sports like never before.",
+    "platform": "Platform",
+    "support": "Support",
+    "legal": "Legal",
+    "browseEvents": "Browse Events",
+    "myPurchases": "My Purchases",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "helpCenter": "Help Center",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "© 2024 Sporttech Inc. All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "exit": "Exit",
+    "signIn": "Sign In",
+    "register": "Register",
+    "admin": "Admin",
+    "myEvents": "My Events",
+    "buyTicket": "Buy Ticket",
+    "finished": "Finished",
+    "live": "LIVE",
+    "draft": "DRAFT",
+    "back": "Back",
+    "accessStream": "ACCESS STREAM",
+    "eventEnded": "EVENT ENDED",
+    "date": "Date",
+    "time": "Time",
+    "eventNotFound": "Event Not Found",
+    "backToHome": "Back to Home",
+    "aboutEvent": "About this event",
+    "noDescription": "No description available for this event.",
+    "secureStream": "Secure Streaming",
+    "secureStreamDesc": "Exclusive access via personal encrypted token.",
+    "instantAccess": "Instant Access",
+    "instantAccessDesc": "Receive access automatically after payment confirmation.",
+    "ticketPrice": "Ticket Price",
+    "paymentMethods": "Global Payment Methods",
+    "watchTitle": "Watch Event",
+    "chatTitle": "Live Chat",
+    "noChat": "Chat is not available for this event.",
+    "loadingStream": "Loading stream...",
+    "purchasedOn": "Purchased on",
+    "viewStream": "Watch Stream",
+    "waitingConfirmation": "Waiting for confirmation",
+    "tryAgain": "Try again",
+    "noTicketsYet": "You don't have any tickets yet",
+    "noTicketsYetDesc": "Explore the available events and get your access to start enjoying the best content.",
+    "myTickets": "My Tickets",
+    "acquiredEvents": "My Acquired Events"
+  },
+  "home": {
+    "title": "Exclusive Live Events",
+    "subtitle": "Access unique live event streams. Buy your ticket and enjoy from anywhere.",
+    "loadingEvents": "Loading events...",
+    "upcoming": "Upcoming Events",
+    "past": "Past Events",
+    "noEvents": "No events available at this time."
+  },
+  "errors": {
+    "noAccess": {
+      "title": "Access Denied",
+      "desc": "You don't have an active subscription for this event."
+    },
+    "unauthorized": {
+      "title": "Session Required",
+      "desc": "You must log in to access the broadcast."
+    },
+    "notFound": {
+      "desc": "The event you are trying to view does not exist."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Enter the elite platform",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "athlete@sporttech.com",
+      "passwordLabel": "Security Key",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Enter the account",
+      "authenticating": "Authenticating...",
+      "success": "Login successful",
+      "error": "Error logging in",
+      "newUser": "New to the elite?",
+      "registerLink": "Register"
+    },
+    "register": {
+      "title": "Join the elite",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "John Doe",
+      "submit": "Create Account",
+      "creating": "Creating Account...",
+      "success": "Account created successfully",
+      "error": "Error creating account",
+      "alreadyUser": "Already part of the elite?",
+      "loginLink": "Log in",
+      "confirmLabel": "Confirm Security Key"
+    }
+  },
+  "payment": {
+    "status": {
+      "successTitle": "Payment Successful!",
+      "pendingTitle": "Payment in Process",
+      "failedTitle": "Payment Failed",
+      "successDesc": "Your ticket has been successfully confirmed. You can now access the event from your user dashboard.",
+      "pendingDesc": "We are confirming the funds with your bank. This usually takes a few minutes.",
+      "failedDesc": "We have not been able to process your payment. Please try another method or contact support.",
+      "viewEvents": "View My Events",
+      "backToHome": "Back to Home",
+      "toastSuccess": "Payment confirmed! Your ticket has been activated.",
+      "toastPending": "We are processing your payment. We will notify you soon.",
+      "toastFailed": "Could not complete the payment."
+    }
+  }
+}

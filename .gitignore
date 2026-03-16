@@ -31,3 +31,4 @@ dist-ssr
 !package-lock.json
 !firestore.rules
 !.firebaserc
+!src/i18n/locales/*.json
