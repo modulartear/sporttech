@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Calendar, DollarSign, Users, BarChart3, ArrowLeft } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 export function AdminLayout() {
   const location = useLocation();
@@ -25,13 +26,10 @@ export function AdminLayout() {
       <div className="flex">
         <aside className="w-64 min-h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 fixed left-0 top-0">
           <div className="p-6">
-            <Link to="/" className="flex items-center gap-2 mb-8">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
+            <Link to="/" className="flex flex-col gap-4 mb-8">
+              <img src={logo} alt="Sporttech Logo" className="h-10 w-auto" />
               <div>
-                <h1 className="text-white font-bold">Admin Panel</h1>
-                <p className="text-xs text-slate-400">StreamEvents</p>
+                <h1 className="text-white font-bold text-xs uppercase tracking-widest opacity-50">Admin Panel</h1>
               </div>
             </Link>
 

@@ -6,6 +6,7 @@ import { createMercadoPagoPreference } from '../lib/payments';
 import { useAuth } from '../hooks/use-auth';
 import { Calendar, Clock, Play, ArrowLeft, ShieldCheck, Zap } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 type Event = {
   id: string;
@@ -24,6 +25,7 @@ export function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { t, i18n } = useTranslation();
   const [event, setEvent] = useState<Event | null>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +56,7 @@ export function EventDetailsPage() {
       }
     } catch (error) {
       console.error('Error fetching event details:', error);
-      toast.error('No se pudo cargar la información del evento');
+      toast.error(t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +76,7 @@ export function EventDetailsPage() {
       }
     } catch (error: any) {
       console.error('Error processing purchase:', error);
-      toast.error(error.message || 'Error al iniciar el pago');
+      toast.error(error.message || t('common.error'));
     } finally {
       setIsProcessing(false);
     }
@@ -83,7 +85,7 @@ export function EventDetailsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent"></div>
       </div>
     );
   }
@@ -91,11 +93,13 @@ export function EventDetailsPage() {
   if (!event) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white">
-        <h1 className="text-2xl font-bold mb-4">Evento no encontrado</h1>
-        <Link to="/" className="text-blue-400 hover:underline">Volver al inicio</Link>
+        <h1 className="text-2xl font-bold mb-4">{t('common.eventNotFound')}</h1>
+        <Link to="/" className="text-pink-400 hover:underline">{t('common.backToHome')}</Link>
       </div>
     );
   }
+
+  const locale = i18n.language === 'en' ? 'en-US' : 'es-AR';
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
@@ -121,7 +125,7 @@ export function EventDetailsPage() {
             className="flex items-center gap-2 text-slate-400 hover:text-white transition mb-8 group"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span>Volver</span>
+            <span>{t('common.back')}</span>
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -132,10 +136,10 @@ export function EventDetailsPage() {
                   {event.status === 'live' && (
                     <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                       <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                      EN VIVO
+                      {t('common.live')}
                     </span>
                   )}
-                  <span className="bg-blue-500/10 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/20">
+                  <span className="bg-pink-500/10 text-pink-400 text-xs font-bold px-3 py-1 rounded-full border border-pink-500/20">
                     {event.event_type.toUpperCase()}
                   </span>
                 </div>
@@ -146,29 +150,29 @@ export function EventDetailsPage() {
 
               <div className="flex flex-wrap gap-6 text-slate-300 bg-slate-900/50 p-6 rounded-2xl border border-slate-800/50 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                    <Calendar className="w-5 h-5 text-blue-400" />
+                  <div className="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center border border-pink-500/20">
+                    <Calendar className="w-5 h-5 text-pink-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider text-left">Fecha</p>
-                    <p className="font-semibold">{new Date(event.event_date).toLocaleDateString('es-AR', { dateStyle: 'long' })}</p>
+                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider text-left">{t('common.date')}</p>
+                    <p className="font-semibold">{new Date(event.event_date).toLocaleDateString(locale, { dateStyle: 'long' })}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 border-l border-slate-800 pl-6">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-                    <Clock className="w-5 h-5 text-purple-400" />
+                <div className="flex items-center gap-3 border-l border-slate-800 lg:pl-6">
+                  <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
+                    <Clock className="w-5 h-5 text-rose-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider text-left">Hora</p>
-                    <p className="font-semibold">{new Date(event.event_date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
+                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider text-left">{t('common.time')}</p>
+                    <p className="font-semibold">{new Date(event.event_date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                 </div>
               </div>
 
               <div className="prose prose-invert max-w-none">
-                <h3 className="text-xl font-bold text-white mb-4">Acerca de este evento</h3>
+                <h3 className="text-xl font-bold text-white mb-4">{t('common.aboutEvent')}</h3>
                 <p className="text-slate-400 leading-relaxed text-lg">
-                  {event.description || 'No hay descripción disponible para este evento.'}
+                  {event.description || t('common.noDescription')}
                 </p>
               </div>
 
@@ -176,15 +180,15 @@ export function EventDetailsPage() {
                 <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-900/30 border border-slate-800/50">
                   <ShieldCheck className="w-6 h-6 text-green-500 shrink-0" />
                   <div>
-                    <h4 className="font-bold text-white">Transmisión Segura</h4>
-                    <p className="text-sm text-slate-500">Acceso exclusivo mediante token encriptado personal.</p>
+                    <h4 className="font-bold text-white">{t('common.secureStream')}</h4>
+                    <p className="text-sm text-slate-500">{t('common.secureStreamDesc')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4 p-4 rounded-xl bg-slate-900/30 border border-slate-800/50">
                   <Zap className="w-6 h-6 text-yellow-500 shrink-0" />
                   <div>
-                    <h4 className="font-bold text-white">Acceso Instantáneo</h4>
-                    <p className="text-sm text-slate-500">Recibe tu acceso automáticamente tras confirmar el pago.</p>
+                    <h4 className="font-bold text-white">{t('common.instantAccess')}</h4>
+                    <p className="text-sm text-slate-500">{t('common.instantAccessDesc')}</p>
                   </div>
                 </div>
               </div>
@@ -192,12 +196,12 @@ export function EventDetailsPage() {
 
             {/* Right Column: Checkout Card */}
             <div className="lg:col-span-1">
-              <div className="bg-slate-900 rounded-3xl border border-slate-800 p-8 sticky top-24 shadow-2xl shadow-blue-500/5">
+              <div className="bg-slate-900 rounded-3xl border border-slate-800 p-8 sticky top-24 shadow-2xl shadow-pink-500/5">
                 <div className="text-center mb-8">
-                  <p className="text-slate-500 font-bold tracking-widest uppercase text-xs mb-2">Precio de Entrada</p>
+                  <p className="text-slate-500 font-bold tracking-widest uppercase text-xs mb-2">{t('common.ticketPrice')}</p>
                   <div className="flex items-center justify-center gap-1 text-5xl font-black text-white">
                     <span className="text-2xl text-slate-500 font-normal mr-1">{event.currency}</span>
-                    {new Intl.NumberFormat('es-AR').format(Number(event.price))}
+                    {new Intl.NumberFormat(locale).format(Number(event.price))}
                   </div>
                 </div>
 
@@ -208,20 +212,20 @@ export function EventDetailsPage() {
                       className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-3 shadow-lg shadow-green-500/20"
                     >
                       <Play className="w-6 h-6 fill-current" />
-                      ACCEDER AL STREAM
+                      {t('common.accessStream')}
                     </button>
                   ) : (
                     <button
                       onClick={handleBuyTicket}
                       disabled={isProcessing || event.status === 'ended' || event.status === 'cancelled'}
-                      className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-3 shadow-lg shadow-blue-500/20"
+                      className="w-full btn-gradient disabled:opacity-50 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-3 shadow-lg shadow-pink-500/20"
                     >
                       {isProcessing ? (
                         <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         <>
                           <Zap className="w-6 h-6 fill-current" />
-                          {event.status === 'ended' ? 'EVENTO FINALIZADO' : 'COMPRAR ENTRADA'}
+                          {event.status === 'ended' ? t('common.eventEnded') : t('common.buyTicket').toUpperCase()}
                         </>
                       )}
                     </button>
@@ -229,7 +233,7 @@ export function EventDetailsPage() {
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-slate-800">
-                  <p className="text-xs text-slate-500 text-center uppercase tracking-widest font-bold mb-4">Métodos de pago globales</p>
+                  <p className="text-xs text-slate-500 text-center uppercase tracking-widest font-bold mb-4">{t('common.paymentMethods')}</p>
                   <div className="flex justify-center items-center gap-4 grayscale opacity-50">
                     <div className="bg-white/10 px-3 py-1.5 rounded-md text-[10px] font-bold text-white">VISA</div>
                     <div className="bg-white/10 px-3 py-1.5 rounded-md text-[10px] font-bold text-white">MASTERCARD</div>

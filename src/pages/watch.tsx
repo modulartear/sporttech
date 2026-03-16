@@ -5,6 +5,7 @@ import { firestore } from '../lib/firebase';
 import { useAuth } from '../hooks/use-auth';
 import { ArrowLeft, ShieldAlert, Lock, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 type Event = {
   id: string;
@@ -19,6 +20,7 @@ export function WatchPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorType, setErrorType] = useState<'no_access' | 'unauthorized' | 'not_found' | null>(null);
@@ -58,7 +60,7 @@ export function WatchPage() {
 
     } catch (error) {
       console.error('Error verifying stream access:', error);
-      toast.error('Ocurrió un error al verificar tu acceso');
+      toast.error(t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +69,8 @@ export function WatchPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mb-6"></div>
-        <p className="text-slate-400 animate-pulse font-medium">Validando token de acceso seguro...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent mb-6"></div>
+        <p className="text-slate-400 animate-pulse font-medium">{t('common.loadingStream')}</p>
       </div>
     );
   }
@@ -77,23 +79,23 @@ export function WatchPage() {
     const errorConfigs = {
       no_access: {
         icon: <Lock className="w-16 h-16 text-yellow-500 mb-6" />,
-        title: "Acceso Denegado",
-        desc: "No tienes una suscripción activa para este evento.",
-        btn: "Comprar entrada",
+        title: t('errors.noAccess.title'),
+        desc: t('errors.noAccess.desc'),
+        btn: t('common.buyTicket'),
         path: `/event/${id}`
       },
       unauthorized: {
         icon: <ShieldAlert className="w-16 h-16 text-red-500 mb-6" />,
-        title: "Sesión Requerida",
-        desc: "Debes iniciar sesión para acceder a la transmisión.",
-        btn: "Ir al login",
+        title: t('errors.unauthorized.title'),
+        desc: t('errors.unauthorized.desc'),
+        btn: t('common.signIn'),
         path: "/login"
       },
       not_found: {
         icon: <ShieldAlert className="w-16 h-16 text-slate-500 mb-6" />,
-        title: "Evento no encontrado",
-        desc: "El evento que intentas ver no existe.",
-        btn: "Volver al inicio",
+        title: t('common.eventNotFound'),
+        desc: t('errors.notFound.desc'),
+        btn: t('common.backToHome'),
         path: "/"
       }
     };
@@ -108,7 +110,7 @@ export function WatchPage() {
           <p className="text-slate-400 mb-8">{config.desc}</p>
           <Link 
             to={config.path} 
-            className="w-full inline-block py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition shadow-lg shadow-blue-500/20"
+            className="w-full inline-block py-3 btn-gradient text-white font-bold rounded-2xl transition shadow-lg shadow-pink-500/20"
           >
             {config.btn}
           </Link>
@@ -132,22 +134,22 @@ export function WatchPage() {
             <h1 className="font-bold text-sm md:text-base line-clamp-1">{event?.title}</h1>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-              <span className="text-[10px] uppercase font-black tracking-widest text-red-500">Live Secure Stream</span>
+              <span className="text-[10px] uppercase font-black tracking-widest text-red-500">{t('common.live')} SECURE STREAM</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3 px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full backdrop-blur-md">
            <Eye className="w-4 h-4 text-green-500" />
-           <span className="text-[10px] font-bold text-green-500">VALIDATED</span>
+           <span className="text-[10px] font-bold text-green-500 uppercase">VALIDATED</span>
         </div>
       </nav>
 
       {/* Main Content: Video Player */}
       <main className="flex-1 flex items-center justify-center relative bg-slate-950">
-        <div className="w-full aspect-video max-w-6xl shadow-2xl shadow-blue-500/10 relative group">
+        <div className="w-full aspect-video max-w-6xl shadow-2xl shadow-pink-500/10 relative group">
           <iframe
             src={`https://www.youtube.com/embed/${event?.youtube_video_id}?autoplay=1&modestbranding=1&rel=0`}
-            title={event?.title}
+            title={event?.title || 'Video'}
             className="w-full h-full rounded-2xl md:border md:border-slate-800 bg-black"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -169,7 +171,7 @@ export function WatchPage() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
              <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center">
-                <ShieldAlert className="w-6 h-6 text-blue-500" />
+                <ShieldAlert className="w-6 h-6 text-pink-500" />
              </div>
              <div>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Stream ID</p>

@@ -1,42 +1,42 @@
 import { Link } from 'react-router-dom';
 import { Play, Shield, Zap, Globe, ArrowRight, Video, Users, CreditCard } from 'lucide-react';
 import { useAuth } from '../hooks/use-auth';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/language-switcher';
+import logo from '../assets/logo.png';
 
 export function LandingPage() {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-pink-500/30">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-zinc-800/50">
         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-700 rounded-lg transform lg:group-hover:rotate-12 transition-transform duration-300 flex items-center justify-center">
-              <Play className="w-6 h-6 fill-white" />
-            </div>
-            <span className="text-2xl font-black italic tracking-tighter uppercase tracking-[-0.05em] text-white">
-              Sport<span className="text-pink-500">tech</span>
-            </span>
-          </div>
+          <Link to="/" className="flex items-center gap-2 group cursor-pointer">
+            <img src={logo} alt="Sporttech Logo" className="h-10 w-auto" />
+          </Link>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#about" className="hover:text-white transition-colors">About</a>
-            <Link to="/events" className="text-pink-500 hover:text-pink-400 font-bold transition-colors border-b border-pink-500/0 hover:border-pink-500/100">PLATFORM</Link>
+            <a href="#features" className="hover:text-white transition-colors">{t('nav.features')}</a>
+            <a href="#about" className="hover:text-white transition-colors">{t('nav.about')}</a>
+            <Link to="/events" className="text-pink-500 hover:text-pink-400 font-bold transition-colors border-b border-pink-500/0 hover:border-pink-500/100">{t('nav.platform')}</Link>
           </div>
 
           <div className="flex items-center gap-4">
+            <LanguageSwitcher />
             {isAuthenticated ? (
               <Link to="/events" className="btn-gradient px-6 py-2 text-sm rounded-xl">
-                Go to Dashboard
+                {t('nav.dashboard')}
               </Link>
             ) : (
               <>
                 <Link to="/login" className="text-sm font-medium hover:text-white transition-colors hidden sm:block">
-                  Sign In
+                  {t('nav.signIn')}
                 </Link>
                 <Link to="/login" className="btn-gradient px-6 py-2 text-sm rounded-xl">
-                  Get Started
+                  {t('nav.getStarted')}
                 </Link>
               </>
             )}
@@ -57,34 +57,38 @@ export function LandingPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
                 </span>
-                LIVE STREAMING EVOLVED
+                {t('hero.badge')}
               </div>
               <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.9] mb-8">
-                The Future of <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-700">Sports</span> Streaming
+                {t('hero.title').split('Sports').map((part, i, arr) => (
+                  <span key={i}>
+                    {part}
+                    {i < arr.length - 1 && <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-700">Sports</span>}
+                  </span>
+                ))}
               </h1>
               <p className="text-xl text-zinc-400 mb-10 leading-relaxed max-w-2xl">
-                Experience high-performance streaming with integrated digital ticketing, 
-                real-time analytics, and seamless payment processing. Built for the modern athlete and fan.
+                {t('hero.description')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/events" className="btn-gradient text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-2 group">
-                  Explore Events
+                  {t('hero.explore')}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <a href="#features" className="px-8 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-all font-bold flex items-center justify-center gap-2">
-                  How it works
+                  {t('hero.howItWorks')}
                 </a>
               </div>
 
               <div className="mt-20 flex items-center gap-8 grayscale opacity-50">
                 <div className="flex items-center gap-2 font-black italic text-2xl tracking-tighter uppercase">
-                  <Globe className="w-6 h-6" /> GLOBAL
+                  <Globe className="w-6 h-6" /> {t('hero.global')}
                 </div>
                 <div className="flex items-center gap-2 font-black italic text-2xl tracking-tighter uppercase">
-                  <Shield className="w-6 h-6" /> SECURE
+                  <Shield className="w-6 h-6" /> {t('hero.secure')}
                 </div>
                 <div className="flex items-center gap-2 font-black italic text-2xl tracking-tighter uppercase">
-                  <Zap className="w-6 h-6" /> FAST
+                  <Zap className="w-6 h-6" /> {t('hero.fast')}
                 </div>
               </div>
             </div>
@@ -97,33 +101,33 @@ export function LandingPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               <FeatureCard 
                 icon={<Video className="w-8 h-8 text-pink-500" />}
-                title="HD Streaming"
-                description="Zero-latency high definition streams optimized for mobile and web viewers."
+                title={t('features.hd.title')}
+                description={t('features.hd.description')}
               />
               <FeatureCard 
                 icon={<CreditCard className="w-8 h-8 text-pink-500" />}
-                title="Smart Ticketing"
-                description="Integrated MercadoPago payments for instant access to premium live events."
+                title={t('features.ticketing.title')}
+                description={t('features.ticketing.description')}
               />
               <FeatureCard 
                 icon={<Shield className="w-8 h-8 text-pink-500" />}
-                title="Anti-Piracy"
-                description="Secure embed tokens and user verification to protect your valuable content."
+                title={t('features.security.title')}
+                description={t('features.security.description')}
               />
               <FeatureCard 
                 icon={<Users className="w-8 h-8 text-pink-500" />}
-                title="Community"
-                description="Built-in social features and real-time interaction for fans worldwide."
+                title={t('features.community.title')}
+                description={t('features.community.description')}
               />
               <FeatureCard 
                 icon={<Globe className="w-8 h-8 text-pink-500" />}
-                title="Global Scale"
-                description="Content delivery network (CDN) ensures smooth performance from anywhere."
+                title={t('features.scale.title')}
+                description={t('features.scale.description')}
               />
               <FeatureCard 
                 icon={<Zap className="w-8 h-8 text-pink-500" />}
-                title="Elite Performance"
-                description="Optimized architecture for handling thousands of concurrent viewers."
+                title={t('features.performance.title')}
+                description={t('features.performance.description')}
               />
             </div>
           </div>
@@ -135,42 +139,40 @@ export function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <Play className="w-6 h-6 text-pink-500 fill-pink-500" />
-                <span className="text-xl font-black italic tracking-tighter uppercase">Sporttech</span>
+                <img src={logo} alt="Sporttech Logo" className="h-8 w-auto" />
               </div>
               <p className="max-w-xs text-zinc-500 text-sm leading-relaxed">
-                The premier platform for sports streaming and digital event management. 
-                Experience sports like never before.
+                {t('footer.description')}
               </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-12">
               <div>
-                <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">Platform</h4>
+                <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">{t('footer.platform')}</h4>
                 <ul className="space-y-4 text-sm text-zinc-500 font-medium">
-                  <li><Link to="/events" className="hover:text-pink-500 transition-colors">Browse Events</Link></li>
-                  <li><Link to="/my-events" className="hover:text-pink-500 transition-colors">My Purchases</Link></li>
-                  <li><a href="#" className="hover:text-pink-500 transition-colors">Pricing</a></li>
+                  <li><Link to="/events" className="hover:text-pink-500 transition-colors">{t('footer.browseEvents')}</Link></li>
+                  <li><Link to="/my-events" className="hover:text-pink-500 transition-colors">{t('footer.myPurchases')}</Link></li>
+                  <li><a href="#" className="hover:text-pink-500 transition-colors">{t('footer.pricing')}</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">Support</h4>
+                <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">{t('footer.support')}</h4>
                 <ul className="space-y-4 text-sm text-zinc-500 font-medium">
-                  <li><a href="#" className="hover:text-pink-500 transition-colors">FAQ</a></li>
-                  <li><a href="#" className="hover:text-pink-500 transition-colors">Help Center</a></li>
-                  <li><a href="#" className="hover:text-pink-500 transition-colors">Contact</a></li>
+                  <li><a href="#" className="hover:text-pink-500 transition-colors">{t('footer.faq')}</a></li>
+                  <li><a href="#" className="hover:text-pink-500 transition-colors">{t('footer.helpCenter')}</a></li>
+                  <li><a href="#" className="hover:text-pink-500 transition-colors">{t('footer.contact')}</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">Legal</h4>
+                <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-zinc-400">{t('footer.legal')}</h4>
                 <ul className="space-y-4 text-sm text-zinc-500 font-medium">
-                  <li><a href="#" className="hover:text-pink-500 transition-colors">Privacy Policy</a></li>
-                  <li><a href="#" className="hover:text-pink-500 transition-colors">Terms of Service</a></li>
+                  <li><a href="#" className="hover:text-pink-500 transition-colors">{t('footer.privacy')}</a></li>
+                  <li><a href="#" className="hover:text-pink-500 transition-colors">{t('footer.terms')}</a></li>
                 </ul>
               </div>
             </div>
           </div>
           <div className="pt-12 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6 text-zinc-500 text-xs">
-            <p>© 2024 Sporttech Inc. All rights reserved.</p>
+            <p>{t('footer.rights')}</p>
             <div className="flex gap-8 uppercase tracking-widest font-bold">
               <a href="#" className="hover:text-white transition-colors">Instagram</a>
               <a href="#" className="hover:text-white transition-colors">YouTube</a>

@@ -5,6 +5,8 @@ import { firestore } from '../lib/firebase';
 import { useAuth } from '../hooks/use-auth';
 import { Calendar, Play, ArrowLeft, Ticket, ExternalLink, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import logo from '../assets/logo.png';
 
 type Purchase = {
   id: string;
@@ -23,6 +25,7 @@ type Purchase = {
 export function MyEventsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -66,41 +69,43 @@ export function MyEventsPage() {
       setPurchases(hydrated);
     } catch (error) {
       console.error('Error fetching my events:', error);
-      toast.error('No se pudieron cargar tus eventos');
+      toast.error(t('common.error'));
     } finally {
       setIsLoading(false);
     }
   };
 
+  const locale = i18n.language === 'en' ? 'en-US' : 'es-AR';
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 pb-20">
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-4 group">
             <ArrowLeft className="w-5 h-5 text-slate-400 group-hover:text-white transition" />
-            <span className="text-xl font-bold text-white">StreamEvents</span>
+            <img src={logo} alt="Sporttech Logo" className="h-8 w-auto" />
           </Link>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-            <Ticket className="w-4 h-4 text-blue-400" />
-            <span className="text-sm font-bold text-blue-400">Mis Entradas</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-500/10 border border-pink-500/20 rounded-lg">
+            <Ticket className="w-4 h-4 text-pink-400" />
+            <span className="text-sm font-bold text-pink-400">{t('common.myTickets')}</span>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-extrabold text-white mb-8">Mis Eventos Adquiridos</h1>
+          <h1 className="text-3xl font-extrabold text-white mb-8">{t('common.acquiredEvents')}</h1>
 
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-4 border-pink-500 border-t-transparent"></div>
             </div>
           ) : purchases.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">
               {purchases.map((purchase) => (
                 <div 
                   key={purchase.id}
-                  className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition flex flex-col md:flex-row"
+                  className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-pink-500/30 transition flex flex-col md:flex-row"
                 >
                   <div className="w-full md:w-64 h-40 bg-slate-800 shrink-0">
                     {purchase.event.thumbnail_url ? (
@@ -131,11 +136,11 @@ export function MyEventsPage() {
                       <div className="flex flex-wrap gap-4 text-sm text-slate-400 mb-4">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-4 h-4" />
-                          <span>{new Date(purchase.event.event_date).toLocaleDateString('es-AR', { dateStyle: 'medium' })}</span>
+                          <span>{new Date(purchase.event.event_date).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Clock className="w-4 h-4" />
-                          <span>{new Date(purchase.event.event_date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs</span>
+                          <span>{new Date(purchase.event.event_date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })} hs</span>
                         </div>
                       </div>
                     </div>
@@ -148,22 +153,22 @@ export function MyEventsPage() {
                       {purchase.payment_status === 'approved' ? (
                         <button
                           onClick={() => navigate(`/watch/${purchase.event_id}`)}
-                          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition flex items-center gap-2"
+                          className="px-6 py-2 btn-gradient text-white text-sm font-bold rounded-xl transition flex items-center gap-2"
                         >
                           <Play className="w-4 h-4 fill-current" />
-                          Ver Transmisión
+                          {t('common.viewStream')}
                         </button>
                       ) : purchase.payment_status === 'pending' ? (
                         <div className="text-sm font-bold text-yellow-500 flex items-center gap-2">
                           <Clock className="w-4 h-4" />
-                          Esperando confirmación
+                          {t('common.waitingConfirmation')}
                         </div>
                       ) : (
                         <Link 
                           to={`/event/${purchase.event_id}`}
-                          className="text-sm font-bold text-blue-400 hover:underline flex items-center gap-2"
+                          className="text-sm font-bold text-pink-400 hover:underline flex items-center gap-2"
                         >
-                          Intentar nuevamente <ExternalLink className="w-4 h-4" />
+                          {t('common.tryAgain')} <ExternalLink className="w-4 h-4" />
                         </Link>
                       )}
                     </div>
@@ -176,12 +181,12 @@ export function MyEventsPage() {
               <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Ticket className="w-8 h-8 text-slate-600" />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">No tienes entradas aún</h2>
+              <h2 className="text-xl font-bold text-white mb-2">{t('common.noTicketsYet')}</h2>
               <p className="text-slate-500 mb-8 max-w-sm mx-auto">
-                Explora los eventos disponibles y adquiere tu acceso para comenzar a disfrutar del mejor contenido.
+                {t('common.noTicketsYetDesc')}
               </p>
-              <Link to="/" className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition inline-block">
-                Explorar Eventos
+              <Link to="/" className="px-8 py-3 btn-gradient text-white font-bold rounded-2xl transition inline-block">
+                {t('hero.explore')}
               </Link>
             </div>
           )}

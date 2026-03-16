@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { useAuth } from '../../hooks/use-auth';
 import { UserPlus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import logo from '../../assets/logo.png';
 
 const registerSchema = z.object({
   fullName: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
@@ -22,6 +24,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export function RegisterPage() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -40,11 +43,11 @@ export function RegisterPage() {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success('Registro exitoso. Bienvenido!');
+        toast.success(t('auth.register.success'));
         navigate('/');
       }
     } catch (error) {
-      toast.error('Error al registrarse');
+      toast.error(t('auth.register.error'));
     } finally {
       setIsLoading(false);
     }
@@ -58,24 +61,23 @@ export function RegisterPage() {
         
         <div className="bg-zinc-900/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-zinc-800 p-10 relative z-10">
           <div className="text-center mb-10">
-            <Link to="/" className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pink-500 to-rose-700 rounded-2xl mb-6 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
-              <UserPlus className="w-10 h-10 text-white" />
+            <Link to="/" className="inline-flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
+              <img src={logo} alt="Sporttech Logo" className="h-16 w-auto" />
             </Link>
-            <h1 className="text-4xl font-black italic tracking-tighter uppercase text-white mb-2">Sport<span className="text-pink-500">tech</span></h1>
-            <p className="text-zinc-500 font-medium">Únete a la nueva era del deporte</p>
+            <p className="text-zinc-500 font-medium mt-4">{t('auth.register.title')}</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label htmlFor="fullName" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
-                Full Name
+                {t('auth.register.nameLabel')}
               </label>
               <input
                 {...register('fullName')}
                 type="text"
                 id="fullName"
                 className="w-full px-5 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all"
-                placeholder="Nombre Completo"
+                placeholder={t('auth.register.namePlaceholder')}
               />
               {errors.fullName && (
                 <p className="mt-2 text-sm text-pink-500 font-medium ml-1">{errors.fullName.message}</p>
@@ -84,14 +86,14 @@ export function RegisterPage() {
 
             <div>
               <label htmlFor="email" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
-                Email Address
+                {t('auth.login.emailLabel')}
               </label>
               <input
                 {...register('email')}
                 type="email"
                 id="email"
                 className="w-full px-5 py-4 bg-zinc-950 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all"
-                placeholder="atleta@sporttech.com"
+                placeholder={t('auth.login.emailPlaceholder')}
               />
               {errors.email && (
                 <p className="mt-2 text-sm text-pink-500 font-medium ml-1">{errors.email.message}</p>
@@ -100,7 +102,7 @@ export function RegisterPage() {
 
             <div>
               <label htmlFor="password" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
-                Secret Password
+                {t('auth.login.passwordLabel')}
               </label>
               <input
                 {...register('password')}
@@ -116,7 +118,7 @@ export function RegisterPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3 ml-1">
-                Confirm Password
+                {t('auth.register.confirmLabel')}
               </label>
               <input
                 {...register('confirmPassword')}
@@ -138,12 +140,12 @@ export function RegisterPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Registrando...</span>
+                  <span>{t('auth.register.creating')}</span>
                 </>
               ) : (
                 <>
                   <UserPlus className="w-5 h-5" />
-                  <span>Crear mi cuenta</span>
+                  <span>{t('auth.register.submit')}</span>
                 </>
               )}
             </button>
@@ -151,9 +153,9 @@ export function RegisterPage() {
 
           <div className="mt-10 text-center">
             <p className="text-zinc-500 font-medium">
-              ¿Ya tienes una cuenta?{' '}
+              {t('auth.register.alreadyUser')}{' '}
               <Link to="/login" className="text-pink-500 hover:text-pink-400 font-black italic uppercase transition-colors">
-                Inicia sesión
+                {t('auth.register.loginLink')}
               </Link>
             </p>
           </div>
