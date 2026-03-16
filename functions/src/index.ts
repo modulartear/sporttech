@@ -10,8 +10,12 @@ initializeApp();
 const db = getFirestore();
 const auth = getAuth();
 
+import { defineSecret } from "firebase-functions/params";
+
+const mercadoPagoToken = defineSecret("MERCADOPAGO_ACCESS_TOKEN");
+
 const getMPClient = () => {
-  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  const token = mercadoPagoToken.value() || process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!token) {
     throw new Error("Missing MERCADOPAGO_ACCESS_TOKEN");
   }
@@ -59,7 +63,7 @@ export const setAdminClaim = onCall({ enforceAppCheck: false }, async (request) 
   return { ok: true, uid: targetUser.uid };
 });
 
-export const createMercadoPagoPreference = onCall({ secrets: ["MERCADOPAGO_ACCESS_TOKEN"], enforceAppCheck: false }, async (request) => {
+export const createMercadoPagoPreference = onCall({ secrets: [mercadoPagoToken], enforceAppCheck: false }, async (request) => {
   try {
     const mpClient = getMPClient();
     const preferenceClient = new Preference(mpClient);
@@ -160,7 +164,7 @@ export const createMercadoPagoPreference = onCall({ secrets: ["MERCADOPAGO_ACCES
   }
 });
 
-export const mercadopagoWebhook = onRequest({ secrets: ["MERCADOPAGO_ACCESS_TOKEN"] }, async (req, res) => {
+export const mercadopagoWebhook = onRequest({ secrets: [mercadoPagoToken] }, async (req, res) => {
   const mpClient = getMPClient();
   const paymentClient = new Payment(mpClient);
   if (req.method !== "POST") {
