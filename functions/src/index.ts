@@ -256,3 +256,28 @@ export const mercadopagoWebhook = onRequest({ secrets: [mercadoPagoToken] }, asy
   }
 });
 
+export const adminListUsers = onCall({ enforceAppCheck: false }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "User not authenticated.");
+  }
+
+  const profileRef = await db.collection("user_profiles").doc(request.auth.uid).get();
+  if (profileRef.data()?.role !== "admin") {
+    throw new HttpsError("permission-denied", "User is not an admin.");
+  }
+
+  try {
+    const listUsersResult = await getAuth().listUsers(1000);
+    const users = listUsersResult.users.map((userRecord) => ({
+      uid: userRecord.uid,
+      email: userRecord.email,
+      displayName: userRecord.displayName,
+      creationTime: userRecord.metadata.creationTime,
+    }));
+    return { users };
+  } catch (error: any) {
+    logger.error("Error listing users", error);
+    throw new HttpsError("internal", error.message || "Failed to list users");
+  }
+});
+

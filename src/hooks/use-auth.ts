@@ -38,6 +38,7 @@ export function useAuth() {
 
       await setDoc(profileRef, {
         ...newProfile,
+        email: firebaseAuth.currentUser?.email || '',
         created_at: serverTimestamp(),
         updated_at: serverTimestamp(),
       });
@@ -66,6 +67,7 @@ export function useAuth() {
       const profileRef = doc(firestore, 'user_profiles', cred.user.uid);
       await setDoc(profileRef, {
         full_name: fullName,
+        email: email,
         role: 'user',
         created_at: serverTimestamp(),
         updated_at: serverTimestamp(),

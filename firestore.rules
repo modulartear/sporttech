@@ -47,5 +47,11 @@ service cloud.firestore {
       allow read: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid || isAdmin());
       allow write: if isAdmin();
     }
+
+    // Platform Settings
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }

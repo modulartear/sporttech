@@ -29,13 +29,20 @@ export function AdminUsersPage() {
   const fetchUsers = async () => {
     setIsLoadingUsers(true);
     try {
-      const q = query(collection(firestore, 'user_profiles'), orderBy('created_at', 'desc'));
-      const snap = await getDocs(q);
-      const rows = snap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })) as UserProfile[];
+      const callable = httpsCallable<any, { users: any[] }>(firebaseFunctions, 'adminListUsers');
+      const result = await callable();
+      
+      const rows = result.data.users.map((u: any) => ({
+        id: u.uid,
+        email: u.email,
+        created_at: { toMillis: () => new Date(u.creationTime).getTime() },
+        role: 'user', // Just default for now or we could lookup roles
+      })) as UserProfile[];
+      
       setUsers(rows);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Error cargando los usuarios');
+      toast.error('Error cargando los usuarios (asegúrate de que las rules permitan esto)');
     } finally {
       setIsLoadingUsers(false);
     }
