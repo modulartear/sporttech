@@ -35,3 +35,5 @@ Configure these variables in your Supabase project (Functions settings):
   - Ensures the user is authenticated (redirects to `/login` otherwise).
   - Requests a MercadoPago preference and redirects the browser to `initPoint` to complete the payment.
 
+
+Deploy version: 1.0.1 - 2026-03-16 11:51:25
