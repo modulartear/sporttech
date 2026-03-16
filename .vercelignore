@@ -1,0 +1,9 @@
+functions
+supabase
+scripts
+.firebase
+.firebaserc
+firestore.rules
+firestore.indexes.json
+firebase.json
+README.md
