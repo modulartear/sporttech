@@ -36,17 +36,32 @@ export function AdminPaymentsPage() {
       const snap = await getDocs(q);
       const rows = snap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })) as Purchase[];
 
+      // Fetch all users to get their emails reliably
+      let usersMap = new Map<string, string>();
+      try {
+        const { httpsCallable } = await import('firebase/functions');
+        const { firebaseFunctions } = await import('../../lib/firebase');
+        const callable = httpsCallable<any, { users: any[] }>(firebaseFunctions, 'adminListUsers');
+        const result = await callable();
+        result.data.users.forEach((u: any) => usersMap.set(u.uid, u.email));
+      } catch (e) {
+        console.error('Error fetching users map:', e);
+      }
+
       // Hydrate with user email and event title
       const hydrated = await Promise.all(rows.map(async (row) => {
-        let userEmail = 'Usuario';
+        let userEmail = usersMap.get(row.user_id) || 'Usuario';
         let eventTitle = 'Evento';
         
-        try {
-          const userSnap = await getDoc(doc(firestore, 'user_profiles', row.user_id));
-          if (userSnap.exists()) {
-            userEmail = (userSnap.data() as any).email || row.user_id;
-          }
-        } catch (e) {}
+        // Fallback to user_profiles if not in auth list (though unlikely for active users)
+        if (userEmail === 'Usuario') {
+          try {
+            const userSnap = await getDoc(doc(firestore, 'user_profiles', row.user_id));
+            if (userSnap.exists()) {
+              userEmail = (userSnap.data() as any).email || row.user_id;
+            }
+          } catch (e) {}
+        }
 
         try {
           const eventSnap = await getDoc(doc(firestore, 'events', row.event_id));
