@@ -126,7 +126,7 @@ export function EventDetailsPage() {
       }, { merge: true });
       
       setShowTransferDetails(false);
-      navigate('/payment/pending');
+      navigate('/payment/pending?status=pending');
     } catch (error: any) {
       toast.error(error.message || 'Error al procesar la transferencia');
     } finally {

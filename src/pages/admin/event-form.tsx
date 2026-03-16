@@ -3,10 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { firestore } from '../../lib/firebase';
+import { firestore, firebaseStorage } from '../../lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../../hooks/use-auth';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Upload, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 const eventSchema = z.object({
@@ -31,11 +31,14 @@ export function EventFormPage() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(!!id);
+  const [isUploading, setIsUploading] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
@@ -80,6 +83,34 @@ export function EventFormPage() {
       navigate('/admin/events');
     } finally {
       setIsFetching(false);
+    }
+  };
+
+  const thumbnailUrl = watch('thumbnail_url');
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate if it's an image
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor, selecciona un archivo de imagen válido');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+      const storageRef = ref(firebaseStorage, `event_thumbnails/${fileName}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setValue('thumbnail_url', url);
+      toast.success('Imagen subida correctamente');
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      toast.error('Error al subir la imagen. Verifica los permisos de Storage.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -254,17 +285,76 @@ export function EventFormPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">URL de Miniatura</label>
-            <input
-              {...register('thumbnail_url')}
-              type="url"
-              className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="https://example.com/image.jpg"
-            />
-            {errors.thumbnail_url && (
-              <p className="mt-1 text-sm text-red-400">{errors.thumbnail_url.message}</p>
-            )}
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-slate-300">Miniatura del Evento</label>
+            
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Preview Area */}
+              <div className="w-full md:w-64 h-40 bg-slate-900/50 border-2 border-dashed border-slate-700 rounded-xl overflow-hidden flex items-center justify-center group relative">
+                {thumbnailUrl ? (
+                  <>
+                    <img 
+                      src={thumbnailUrl} 
+                      alt="Miniatura" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <p className="text-white text-xs font-bold uppercase">Vista previa</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center p-4">
+                    <ImageIcon className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                    <p className="text-xs text-slate-500">Sin imagen seleccionada</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Actions */}
+              <div className="flex-1 space-y-4">
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    id="thumbnail-upload"
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                  <label
+                    htmlFor="thumbnail-upload"
+                    className={`flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl cursor-pointer transition ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Upload className="w-5 h-5" />
+                    )}
+                    <span className="font-bold text-sm uppercase italic tracking-tighter">
+                      {isUploading ? 'Subiendo...' : 'Subir Imagen'}
+                    </span>
+                  </label>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-slate-500 text-xs">URL</span>
+                  </div>
+                  <input
+                    {...register('thumbnail_url')}
+                    type="url"
+                    className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="https://o pega una URL externa aquí..."
+                  />
+                </div>
+                <p className="text-xs text-slate-500 italic">
+                  * Recomendado: 1280x720px (16:9)
+                </p>
+                {errors.thumbnail_url && (
+                  <p className="mt-1 text-sm text-red-400">{errors.thumbnail_url.message}</p>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
