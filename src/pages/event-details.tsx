@@ -444,7 +444,7 @@ export function EventDetailsPage() {
               <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl">
                 <p className="text-sm text-blue-200">
                   <strong className="text-blue-400 block mb-1">Instrucciones:</strong>
-                  Realiza la transferencia desde tu banco o billetera virtual por el monto exacto. Luego, haz clic en "Ya Transferí" para registrar tu pago. Tu ticket se liberará una vez validemos la acreditación.
+                  Realiza la transferencia desde tu banco o billetera virtual por el monto exacto. Luego, haz clic en "Ya Transferí\" para registrar tu pago. Tu ticket se liberará una vez validemos la acreditación.
                 </p>
               </div>
 
