@@ -88,10 +88,14 @@ export function EventDetailsPage() {
       navigate('/login');
       return;
     }
+    if (!id) {
+      toast.error('ID de evento no válido');
+      return;
+    }
     setIsProcessing(true);
     setShowPaymentSelector(false);
     try {
-      const result = await createMercadoPagoPreference(id!);
+      const result = await createMercadoPagoPreference(id);
       const initPoint = result?.initPoint;
       if (initPoint) {
         window.location.href = initPoint;

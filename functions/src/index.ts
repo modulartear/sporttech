@@ -15,8 +15,8 @@ const mercadoPagoToken = defineSecret("MERCADOPAGO_ACCESS_TOKEN");
 
 const getMPToken = () => {
   const val = (mercadoPagoToken.value() || process.env.MERCADOPAGO_ACCESS_TOKEN || "");
-  // Strictly clean: letters, numbers, hyphens and underscores only
-  return val.toString().replace(/[^A-Za-z0-9_-]/g, "").trim();
+  // Clean whitespace and newlines but preserve the token structure
+  return val.toString().trim();
 };
 
 function asPaymentStatus(status: string): "pending" | "approved" | "rejected" | "refunded" {
