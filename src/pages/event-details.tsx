@@ -261,9 +261,10 @@ export function EventDetailsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 min-h-[120px] flex flex-col items-center justify-center">
                   {hasAccess ? (
                     <button
+                      key="access-button"
                       onClick={() => navigate(`/watch/${event.id}`)}
                       className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-3 shadow-lg shadow-green-500/20"
                     >
@@ -271,8 +272,9 @@ export function EventDetailsPage() {
                       {t('common.accessStream')}
                     </button>
                   ) : (
-                    <>
+                    <div className="w-full space-y-4" key="purchase-container">
                       <button
+                        key="buy-button"
                         onClick={handleBuyTicketMercadoPago}
                         disabled={isProcessing || event.status === 'ended' || event.status === 'cancelled'}
                         className="w-full btn-gradient disabled:opacity-50 text-white font-bold py-4 px-6 rounded-2xl transition flex items-center justify-center gap-3 shadow-lg shadow-pink-500/20"
@@ -289,13 +291,14 @@ export function EventDetailsPage() {
                       
                       {!isProcessing && event.status !== 'ended' && (
                         <button
+                          key="other-methods"
                           onClick={() => setShowPaymentSelector(true)}
                           className="w-full text-slate-500 hover:text-pink-400 text-xs font-bold uppercase tracking-widest transition-colors py-2"
                         >
                           Ver otros métodos de pago
                         </button>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
 

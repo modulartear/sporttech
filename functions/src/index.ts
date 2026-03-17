@@ -3,7 +3,6 @@ import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 
 initializeApp();
 
@@ -14,14 +13,10 @@ import { defineSecret } from "firebase-functions/params";
 
 const mercadoPagoToken = defineSecret("MERCADOPAGO_ACCESS_TOKEN");
 
-const getMPClient = () => {
+const getMPToken = () => {
   const val = (mercadoPagoToken.value() || process.env.MERCADOPAGO_ACCESS_TOKEN || "");
-  const token = val.toString().replace(/[^A-Za-z0-9-]/g, "").trim();
-  
-  if (!token) {
-    throw new Error("Missing MERCADOPAGO_ACCESS_TOKEN");
-  }
-  return new MercadoPagoConfig({ accessToken: token });
+  // Strictly clean: letters, numbers, hyphens and underscores only
+  return val.toString().replace(/[^A-Za-z0-9_-]/g, "").trim();
 };
 
 function asPaymentStatus(status: string): "pending" | "approved" | "rejected" | "refunded" {
@@ -32,225 +27,133 @@ function asPaymentStatus(status: string): "pending" | "approved" | "rejected" | 
   return "pending";
 }
 
-export const setAdminClaim = onCall({ enforceAppCheck: false }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  // Only existing admins can promote others.
-  const callerIsAdmin = request.auth.token.admin === true;
-  if (!callerIsAdmin) {
-    throw new HttpsError("permission-denied", "Admin privileges required");
-  }
-
-  const uid = (request.data?.uid ?? "") as string;
-  const email = (request.data?.email ?? "") as string;
-
-  if (!uid && !email) {
-    throw new HttpsError("invalid-argument", "Provide uid or email");
-  }
-
-  const targetUser = uid ? await auth.getUser(uid) : await auth.getUserByEmail(email);
-  await auth.setCustomUserClaims(targetUser.uid, { ...(targetUser.customClaims ?? {}), admin: true });
-
-  await db.collection("user_profiles").doc(targetUser.uid).set(
-    {
-      role: "admin",
-      updated_at: FieldValue.serverTimestamp(),
-      created_at: FieldValue.serverTimestamp(),
-    },
-    { merge: true },
-  );
-
-  return { ok: true, uid: targetUser.uid };
-});
-
 export const createMercadoPagoPreference = onCall({ secrets: [mercadoPagoToken], enforceAppCheck: false }, async (request) => {
   try {
-    const mpClient = getMPClient();
-    const preferenceClient = new Preference(mpClient);
-
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "User must be authenticated");
-    }
+    const token = getMPToken();
+    if (!request.auth) throw new HttpsError("unauthenticated", "User must be authenticated");
 
     const uid = request.auth.uid;
     const eventId = (request.data?.eventId ?? "") as string;
-    if (!eventId) {
-      throw new HttpsError("invalid-argument", "Missing eventId");
-    }
-
-    logger.info(`Creating preference for user ${uid} and event ${eventId}`);
+    if (!eventId) throw new HttpsError("invalid-argument", "Missing eventId");
 
     const eventSnap = await db.collection("events").doc(eventId).get();
-    if (!eventSnap.exists) {
-      throw new HttpsError("not-found", "Event not found");
-    }
+    if (!eventSnap.exists) throw new HttpsError("not-found", "Event not found");
 
     const event = eventSnap.data() as any;
     const price = Number(event.price ?? 0);
     const currency = (event.currency ?? "ARS") as string;
     const title = (event.title ?? "Evento") as string;
-    const description = (event.description ?? undefined) as string | undefined;
 
     const purchaseId = `${uid}_${eventId}`;
     const purchaseRef = db.collection("purchases").doc(purchaseId);
-    const existing = await purchaseRef.get();
-
-    if (existing.exists && existing.data()?.payment_status === "approved") {
+    
+    const existingSnap = await purchaseRef.get();
+    if (existingSnap.exists && existingSnap.data()?.payment_status === "approved") {
       throw new HttpsError("already-exists", "Purchase already approved");
     }
 
-    await purchaseRef.set(
-      {
-        user_id: uid,
-        event_id: eventId,
-        payment_method: "mercadopago",
-        payment_status: "pending",
-        amount: price,
-        currency,
-        updated_at: FieldValue.serverTimestamp(),
-        created_at: existing.exists ? existing.data()?.created_at : FieldValue.serverTimestamp(),
+    await purchaseRef.set({
+      user_id: uid,
+      event_id: eventId,
+      payment_method: "mercadopago",
+      payment_status: "pending",
+      amount: price,
+      currency,
+      updated_at: FieldValue.serverTimestamp(),
+      created_at: existingSnap.exists ? existingSnap.data()?.created_at : FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    const origin = "https://sporttechros.vercel.app";
+    
+    // Use Fetch directly to avoid any middle-layer header issues
+    const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-      { merge: true },
-    );
-
-    const originHeader = request.rawRequest.headers.origin;
-    const refererHeader = request.rawRequest.headers.referer;
-    let origin = originHeader || (refererHeader ? new URL(refererHeader).origin : "");
-
-    // Fallback if no origin is found (must be absolute for MP)
-    if (!origin) {
-      origin = "https://sporttech-7f561.web.app"; // Replace with your production domain
-    }
-
-    logger.info(`Using origin: ${origin} for purchase ${purchaseId}`);
-
-    const preference = await preferenceClient.create({
-      body: {
-        items: [
-          {
-            id: eventId,
-            title,
-            description,
-            quantity: 1,
-            unit_price: price,
-            currency_id: currency,
-          },
-        ],
-        metadata: {
-          purchase_id: purchaseId,
-          event_id: eventId,
-          user_id: uid,
-        },
+      body: JSON.stringify({
+        items: [{ id: eventId, title, quantity: 1, unit_price: price, currency_id: currency }],
+        metadata: { purchase_id: purchaseId, user_id: uid, event_id: eventId },
         back_urls: {
-          success: `${origin}/payment-status?status=success&eventId=${eventId}`,
-          failure: `${origin}/payment-status?status=failure&eventId=${eventId}`,
-          pending: `${origin}/payment-status?status=pending&eventId=${eventId}`,
+          success: `${origin}/payment/success`,
+          failure: `${origin}/payment/failure`,
+          pending: `${origin}/payment/pending`,
         },
         auto_return: "approved",
-      },
+        notification_url: "https://mercadopagowebhook-2m5lp3zmga-uc.a.run.app"
+      })
     });
 
-    const initPoint = (preference as any).init_point ?? (preference as any).sandbox_init_point;
+    if (!mpResponse.ok) {
+      const errorText = await mpResponse.text();
+      logger.error("MP API Detailed Error:", { status: mpResponse.status, body: errorText });
+      throw new Error(`MercadoPago API error (${mpResponse.status})`);
+    }
 
-    return {
-      preferenceId: preference.id,
-      initPoint,
-      purchaseId,
-    };
+    const data = await mpResponse.json() as any;
+    return { preferenceId: data.id, initPoint: data.init_point, purchaseId };
+
   } catch (error: any) {
-    logger.error("Error creating MercadoPago preference", error);
+    logger.error("Function Error:", error);
     if (error instanceof HttpsError) throw error;
-    throw new HttpsError("internal", error.message || "Unknown error creating preference");
+    throw new HttpsError("internal", error.message || "Unknown error");
   }
 });
 
 export const mercadopagoWebhook = onRequest({ secrets: [mercadoPagoToken] }, async (req, res) => {
-  const mpClient = getMPClient();
-  const paymentClient = new Payment(mpClient);
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
   }
 
   try {
+    const token = getMPToken();
     const body = req.body ?? {};
-
-    const webhookRef = await db.collection("payment_webhooks").add({
-      provider: "mercadopago",
-      webhook_data: body,
-      processed: false,
-      created_at: FieldValue.serverTimestamp(),
-    });
-
-    const paymentId =
-      body?.data?.id ??
-      body?.["data.id"] ??
-      body?.id ??
-      body?.resource ??
-      null;
+    const paymentId = body?.data?.id ?? body?.id;
 
     if (!paymentId) {
       res.status(200).json({ message: "Webhook received without payment id" });
       return;
     }
 
-    const payment = await paymentClient.get({ id: paymentId.toString() });
+    // Process payment with manual fetch
+    const pResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    if (!pResponse.ok) throw new Error(`MP Payment API error: ${pResponse.status}`);
+    const payment = await pResponse.json() as any;
 
     const status = asPaymentStatus(payment.status ?? "");
-    const metadata = (payment.metadata ?? {}) as any;
-    const purchaseId = metadata.purchase_id as string | undefined;
+    const purchaseId = payment.metadata?.purchase_id;
 
     if (!purchaseId) {
-      await webhookRef.update({ processed: true });
       res.status(200).json({ message: "Payment has no purchase metadata" });
       return;
     }
 
-    const amount = Number(payment.transaction_amount ?? 0);
-    const currency = (payment.currency_id ?? "ARS") as string;
-
     const purchaseRef = db.collection("purchases").doc(purchaseId);
     const purchaseSnap = await purchaseRef.get();
-    if (!purchaseSnap.exists) {
-      await webhookRef.update({ processed: true, purchase_id: purchaseId });
-      res.status(200).json({ message: "Purchase not found, webhook recorded" });
-      return;
-    }
-
-    const purchaseData = purchaseSnap.data() as any;
-    await purchaseRef.set(
-      {
+    if (purchaseSnap.exists) {
+      const purchaseData = purchaseSnap.data() as any;
+      await purchaseRef.set({
         payment_status: status,
-        transaction_id: payment.id?.toString() ?? null,
-        amount,
-        currency,
+        transaction_id: paymentId.toString(),
         updated_at: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
+      }, { merge: true });
 
-    if (status === "approved") {
-      const tokenId = `${purchaseId}`;
-      const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
-
-      await db.collection("access_tokens").doc(tokenId).set(
-        {
+      if (status === "approved") {
+        await db.collection("access_tokens").doc(purchaseId).set({
           purchase_id: purchaseId,
           user_id: purchaseData.user_id,
           event_id: purchaseData.event_id,
-          token: tokenId,
-          expires_at: expiresAt.toISOString(),
           is_active: true,
-          validation_count: 0,
           created_at: FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
+        }, { merge: true });
+      }
     }
 
-    await webhookRef.update({ processed: true, purchase_id: purchaseId });
     res.status(200).json({ message: "Webhook processed" });
   } catch (error) {
     logger.error("Webhook error", error);
@@ -259,27 +162,33 @@ export const mercadopagoWebhook = onRequest({ secrets: [mercadoPagoToken] }, asy
 });
 
 export const adminListUsers = onCall({ enforceAppCheck: false }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User not authenticated.");
-  }
-
-  const profileRef = await db.collection("user_profiles").doc(request.auth.uid).get();
-  if (profileRef.data()?.role !== "admin") {
-    throw new HttpsError("permission-denied", "User is not an admin.");
-  }
+  if (!request.auth) throw new HttpsError("unauthenticated", "User not authenticated.");
+  
+  const profileSnap = await db.collection("user_profiles").doc(request.auth.uid).get();
+  if (profileSnap.data()?.role !== "admin") throw new HttpsError("permission-denied", "Admin role required.");
 
   try {
     const listUsersResult = await getAuth().listUsers(1000);
-    const users = listUsersResult.users.map((userRecord) => ({
-      uid: userRecord.uid,
-      email: userRecord.email,
-      displayName: userRecord.displayName,
-      creationTime: userRecord.metadata.creationTime,
+    const users = listUsersResult.users.map((u) => ({
+      uid: u.uid,
+      email: u.email,
+      displayName: u.displayName,
+      creationTime: u.metadata.creationTime,
     }));
     return { users };
   } catch (error: any) {
-    logger.error("Error listing users", error);
-    throw new HttpsError("internal", error.message || "Failed to list users");
+    throw new HttpsError("internal", "Failed to list users");
   }
 });
 
+export const setAdminClaim = onCall({ enforceAppCheck: false }, async (request) => {
+  if (!request.auth?.token.admin) throw new HttpsError("permission-denied", "Admin privileges required");
+
+  const uid = request.data?.uid;
+  if (!uid) throw new HttpsError("invalid-argument", "Provide uid");
+
+  await auth.setCustomUserClaims(uid, { admin: true });
+  await db.collection("user_profiles").doc(uid).update({ role: "admin" });
+
+  return { ok: true };
+});
