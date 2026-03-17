@@ -100,7 +100,14 @@ export function EventDetailsPage() {
       }
     } catch (error: any) {
       console.error('Error processing purchase:', error);
-      toast.error(error.message || 'Ocurrió un error al procesar el pago.');
+      const msg: string = error?.message ?? 'Ocurrió un error al procesar el pago.';
+      // If session is corrupted, redirect to login immediately
+      if (msg.toLowerCase().includes('cerrá sesión') || msg.toLowerCase().includes('iniciá sesión') || msg.toLowerCase().includes('cerraste') || msg.toLowerCase().includes('corrupta')) {
+        toast.error(msg);
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setIsProcessing(false);
     }
