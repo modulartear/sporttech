@@ -15,7 +15,10 @@ import { defineSecret } from "firebase-functions/params";
 const mercadoPagoToken = defineSecret("MERCADOPAGO_ACCESS_TOKEN");
 
 const getMPClient = () => {
-  const token = (mercadoPagoToken.value() || process.env.MERCADOPAGO_ACCESS_TOKEN || "").trim();
+  const rawToken = (mercadoPagoToken.value() || process.env.MERCADOPAGO_ACCESS_TOKEN || "");
+  const token = rawToken.replace(/[\n\r\s\t]/g, "").trim();
+  logger.info(`MP Token validation: length=${token.length}, startsWithTEST=${token.startsWith("TEST")}`);
+  
   if (!token) {
     throw new Error("Missing MERCADOPAGO_ACCESS_TOKEN");
   }
