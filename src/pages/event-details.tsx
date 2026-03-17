@@ -84,20 +84,23 @@ export function EventDetailsPage() {
   };
 
   const handleBuyTicketMercadoPago = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     setIsProcessing(true);
     setShowPaymentSelector(false);
     try {
-      const { initPoint } = await createMercadoPagoPreference(id!);
+      const result = await createMercadoPagoPreference(id!);
+      const initPoint = result?.initPoint;
       if (initPoint) {
         window.location.href = initPoint;
+      } else {
+        toast.error('No se pudo obtener el link de pago. Intenta de nuevo.');
       }
     } catch (error: any) {
       console.error('Error processing purchase:', error);
-      if (error?.message?.includes('legal HTTP header value')) {
-        toast.error('Sesión corrupta detectada. Por favor, cierra sesión y vuelve a entrar.');
-      } else {
-        toast.error(error.message || t('common.error'));
-      }
+      toast.error(error.message || 'Ocurrió un error al procesar el pago.');
     } finally {
       setIsProcessing(false);
     }
